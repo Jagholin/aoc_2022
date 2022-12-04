@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+regex = "1.7.0"
 
 [[bin]]
 name = "puzzle1a"
@@ -30,3 +31,11 @@ path = "src/main3a.rs"
 [[bin]]
 name = "puzzle3b"
 path = "src/main3b.rs"
+
+[[bin]]
+name = "puzzle4a"
+path = "src/main4a.rs"
+
+[[bin]]
+name = "puzzle4b"
+path = "src/main4b.rs"

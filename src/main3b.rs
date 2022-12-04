@@ -1,5 +1,5 @@
-use std::fs::read_to_string;
 use std::collections::HashSet;
+use std::fs::read_to_string;
 
 fn get_set(line: &str) -> HashSet<char> {
     let line = line.trim();
@@ -24,7 +24,7 @@ fn main() {
         let next_line = lines.next();
         let next_line = match next_line {
             Some(l) => l,
-            None => break
+            None => break,
         };
         let line_2 = lines.next().unwrap();
         let line_3 = lines.next().unwrap();
@@ -41,7 +41,7 @@ fn main() {
 
         let intersect = **intersect.get(0).unwrap();
         intersect.encode_utf8(&mut buf);
-        let priority = if ( intersect.is_ascii_lowercase()) { 
+        let priority = if (intersect.is_ascii_lowercase()) {
             buf[0] - a_prior + 1
         } else {
             buf[0] - capa_prior + 27

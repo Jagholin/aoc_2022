@@ -12,34 +12,34 @@ fn main() {
         match sub1 {
             "A" => {
                 // rock
-                if sub2 == "X" { 
+                if sub2 == "X" {
                     score_total += 3;
                 } else if sub2 == "Y" {
                     score_total += 4;
                 } else if sub2 == "Z" {
                     score_total += 8;
                 }
-            },
+            }
             "B" => {
                 // paper
-                if sub2 == "X" { 
+                if sub2 == "X" {
                     score_total += 1;
                 } else if sub2 == "Y" {
                     score_total += 5;
                 } else if sub2 == "Z" {
                     score_total += 9;
                 }
-            },
+            }
             "C" => {
                 // scissors
-                if sub2 == "X" { 
+                if sub2 == "X" {
                     score_total += 2;
                 } else if sub2 == "Y" {
                     score_total += 6;
                 } else if sub2 == "Z" {
                     score_total += 7;
                 }
-            },
+            }
             _ => panic!("unknown select: {sub1}"),
         }
     }

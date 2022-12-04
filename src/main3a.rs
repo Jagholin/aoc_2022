@@ -1,5 +1,5 @@
-use std::fs::read_to_string;
 use std::collections::HashSet;
+use std::fs::read_to_string;
 
 fn main() {
     let input = read_to_string("input3a.txt").unwrap();
@@ -20,7 +20,7 @@ fn main() {
         let mut set_left = HashSet::with_capacity(line_length / 2);
         let mut set_right = HashSet::with_capacity(line_length / 2);
 
-        let slines = line.split_at(line_length/2);
+        let slines = line.split_at(line_length / 2);
         for c in slines.0.chars() {
             set_left.insert(c);
         }
@@ -34,7 +34,7 @@ fn main() {
 
         let intersect = **intersect.get(0).unwrap();
         intersect.encode_utf8(&mut buf);
-        let priority = if ( intersect.is_ascii_lowercase()) { 
+        let priority = if (intersect.is_ascii_lowercase()) {
             buf[0] - a_prior + 1
         } else {
             buf[0] - capa_prior + 27
