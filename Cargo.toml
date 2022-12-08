@@ -67,3 +67,11 @@ path = "src/main7b.rs"
 [[bin]]
 name = "puzzle7-alt"
 path = "src/main7_alternative.rs"
+
+[[bin]]
+name = "puzzle8a"
+path = "src/main8a.rs"
+
+[[bin]]
+name = "puzzle8b"
+path = "src/main8b.rs"
