@@ -1,12 +1,11 @@
 use std::fs::read_to_string;
 
-fn tree_visible_from(mut i: usize, mut j: usize, treemap: &Vec<Vec<u8>>, di: i32, dj: i32, H: usize, W: usize) -> bool {
+fn tree_visible_from(mut i: usize, mut j: usize, treemap: &Vec<Vec<u8>>, di: isize, dj: isize, H: usize, W: usize) -> bool {
     let mut visible = true;
     let compare = treemap[j][i];
     while i != 0 && j != 0 && i != W-1 && j != H-1 {
-        // println!("adding {di} to {i}, and {dj} to {j}");
-        i = if di < 0 { i - (-di) as usize } else {i + di as usize};
-        j = if dj < 0 { j - (-dj) as usize } else {j + dj as usize};
+        i = i.wrapping_add(di as usize);
+        j = j.wrapping_add(dj as usize);
         if treemap[j][i] >= compare {
             visible = false;
             break;

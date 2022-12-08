@@ -1,14 +1,14 @@
 use std::fs::read_to_string;
 use std::cmp::max;
 
-fn tree_visibility_from(mut i: usize, mut j: usize, treemap: &Vec<Vec<u8>>, di: i32, dj: i32, H: usize, W: usize) -> i32 {
+fn tree_visibility_from(mut i: usize, mut j: usize, treemap: &Vec<Vec<u8>>, di: isize, dj: isize, H: usize, W: usize) -> i32 {
     let mut visibility = 0;
     let compare = treemap[j][i];
     // println!("position {i} {j} in direction {di} {dj}, treemap {compare}: ");
     while i != 0 && j != 0 && i != W-1 && j != H-1 {
         // println!("adding {di} to {i}, and {dj} to {j}");
-        i = if di < 0 { i - (-di) as usize } else {i + di as usize};
-        j = if dj < 0 { j - (-dj) as usize } else {j + dj as usize};
+        i = i.wrapping_add(di as usize);
+        j = j.wrapping_add(dj as usize);
         // println!("    treemap {i} {j}: {}", treemap[j][i]);
         if treemap[j][i] < compare {
             visibility += 1;
