@@ -1,5 +1,5 @@
-use std::fs::read_to_string;
 use std::collections::HashSet;
+use std::fs::read_to_string;
 
 type Location = (isize, isize);
 
@@ -14,14 +14,24 @@ fn move_head(dx: isize, dy: isize, head: Location) -> Location {
 }
 
 fn move_tail(head: Location, tail: Location) -> Location {
-    // move the tail accordingly 
+    // move the tail accordingly
     let mut res = tail.clone();
     let dist = distance2(&head, &tail);
     if dist > 2 {
         // distance is too large, move the tail
-        let mut candidates: Vec<_> = [(-1, -1), (-1,0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)].into_iter()
-            .map(| (tdx, tdy) | (tail.0 + tdx, tail.1 + tdy))
-            .collect();
+        let mut candidates: Vec<_> = [
+            (-1, -1),
+            (-1, 0),
+            (-1, 1),
+            (0, -1),
+            (0, 1),
+            (1, -1),
+            (1, 0),
+            (1, 1),
+        ]
+        .into_iter()
+        .map(|(tdx, tdy)| (tail.0 + tdx, tail.1 + tdy))
+        .collect();
 
         candidates.sort_by(|a, b| distance2(&head, a).cmp(&distance2(&head, b)));
         res = candidates.first().unwrap().to_owned();
@@ -50,7 +60,7 @@ fn main() {
                 "L" => move_head(-1, 0, head),
                 "U" => move_head(0, 1, head),
                 "D" => move_head(0, -1, head),
-                _ => panic!("unknown direction {direction} in line {line}")
+                _ => panic!("unknown direction {direction} in line {line}"),
             };
             tail = move_tail(head, tail);
             tail_positions.insert(tail);

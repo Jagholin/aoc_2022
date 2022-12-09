@@ -1,6 +1,6 @@
 use regex::Regex;
-use std::fs::read_to_string;
 use std::collections::HashMap;
+use std::fs::read_to_string;
 use std::hash::Hash;
 
 fn main() {
@@ -18,10 +18,16 @@ fn main() {
             break;
         }
         lines_iter.next().unwrap();
-        let _:Vec<_> = cargo_rx.find_iter(line).map(|m| {
-            cargo_line.push((line.get(m.start() + 1..m.start() + 2).unwrap(), m.start() + 1));
-            m.start() + 1
-        }).collect();
+        let _: Vec<_> = cargo_rx
+            .find_iter(line)
+            .map(|m| {
+                cargo_line.push((
+                    line.get(m.start() + 1..m.start() + 2).unwrap(),
+                    m.start() + 1,
+                ));
+                m.start() + 1
+            })
+            .collect();
         println!("line end {:?}", cargo_line);
         cargo_lines.push(cargo_line);
     }
@@ -54,7 +60,7 @@ fn main() {
             None => {
                 println!("cant match text: {}", command);
                 continue;
-            },
+            }
         };
         let amount = cm.get(1).unwrap().as_str().parse::<usize>().unwrap();
         let from = cm.get(2).unwrap().as_str().parse::<i32>().unwrap();

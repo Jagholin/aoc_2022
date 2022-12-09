@@ -1,4 +1,8 @@
-use std::{fs::read_to_string, rc::{Rc, Weak}, cell::RefCell};
+use std::{
+    cell::RefCell,
+    fs::read_to_string,
+    rc::{Rc, Weak},
+};
 
 enum FSNode {
     Directory {
@@ -11,34 +15,69 @@ enum FSNode {
         size: usize,
         name: String,
         parent: Weak<RefCell<FSNode>>,
-    }
+    },
 }
 
 impl FSNode {
     fn new_dir(name: impl ToString, parent: Option<Rc<RefCell<FSNode>>>) -> Rc<RefCell<Self>> {
-        let mut res = FSNode::Directory { children: vec![], size: None, name: name.to_string(), parent: None };
+        let mut res = FSNode::Directory {
+            children: vec![],
+            size: None,
+            name: name.to_string(),
+            parent: None,
+        };
         if let Some(p) = parent {
             match &mut res {
-                FSNode::Directory { children, size, name, parent } => {
+                FSNode::Directory {
+                    children,
+                    size,
+                    name,
+                    parent,
+                } => {
                     *parent = Some(Rc::downgrade(&p));
-                },
+                }
                 _ => todo!(),
             }
         }
         Rc::new(RefCell::new(res))
     }
 
-    fn mkdir(&mut self, name: impl ToString, parent: Option<Rc<RefCell<FSNode>>>) -> Rc<RefCell<Self>> {
+    fn mkdir(
+        &mut self,
+        name: impl ToString,
+        parent: Option<Rc<RefCell<FSNode>>>,
+    ) -> Rc<RefCell<Self>> {
         let res = Self::new_dir(name, parent);
-        if let FSNode::Directory { children, size, name, parent } = self {
+        if let FSNode::Directory {
+            children,
+            size,
+            name,
+            parent,
+        } = self
+        {
             children.push(res.clone());
         }
         res
     }
 
-    fn touch(&mut self, name: impl ToString, size: usize, parent: Rc<RefCell<FSNode>>) -> Rc<RefCell<Self>> {
-        let res = Rc::new(RefCell::new(FSNode::File { size: size, name: name.to_string(), parent: Rc::downgrade(&parent) }));
-        if let FSNode::Directory { children, size, name, parent } = self {
+    fn touch(
+        &mut self,
+        name: impl ToString,
+        size: usize,
+        parent: Rc<RefCell<FSNode>>,
+    ) -> Rc<RefCell<Self>> {
+        let res = Rc::new(RefCell::new(FSNode::File {
+            size: size,
+            name: name.to_string(),
+            parent: Rc::downgrade(&parent),
+        }));
+        if let FSNode::Directory {
+            children,
+            size,
+            name,
+            parent,
+        } = self
+        {
             children.push(res.clone());
         }
         res
@@ -46,25 +85,37 @@ impl FSNode {
 
     fn name(&self) -> String {
         match self {
-            FSNode::Directory { children, size, name, parent } => name,
+            FSNode::Directory {
+                children,
+                size,
+                name,
+                parent,
+            } => name,
             FSNode::File { size, name, parent } => name,
-        }.clone()
+        }
+        .clone()
     }
 
     fn parent(&self) -> Rc<RefCell<Self>> {
         match self {
-            FSNode::Directory { children, size, name, parent } => {
-                parent.clone().unwrap().upgrade().unwrap()
-            },
-            FSNode::File { size, name, parent } => {
-                parent.upgrade().unwrap()
-            },
+            FSNode::Directory {
+                children,
+                size,
+                name,
+                parent,
+            } => parent.clone().unwrap().upgrade().unwrap(),
+            FSNode::File { size, name, parent } => parent.upgrade().unwrap(),
         }
     }
 
     fn calc_sizes(&mut self) -> usize {
         match self {
-            FSNode::Directory { children, size, name, parent } => {
+            FSNode::Directory {
+                children,
+                size,
+                name,
+                parent,
+            } => {
                 let mut total_size = 0;
                 for c in children {
                     let mut c = c.borrow_mut();
@@ -72,14 +123,19 @@ impl FSNode {
                 }
                 *size = Some(total_size);
                 total_size
-            },
+            }
             FSNode::File { size, name, parent } => *size,
         }
     }
 
     fn visit_dirs(&self, f: &mut usize) {
         match self {
-            FSNode::Directory { children, size, name, parent } => {
+            FSNode::Directory {
+                children,
+                size,
+                name,
+                parent,
+            } => {
                 // f(name.as_str(), size.unwrap());
                 let size = size.unwrap();
                 if size <= 100000 {
@@ -89,8 +145,8 @@ impl FSNode {
                     let child = c.borrow();
                     child.visit_dirs(f);
                 }
-            },
-            FSNode::File { size, name, parent } => {},
+            }
+            FSNode::File { size, name, parent } => {}
         }
     }
 }
@@ -123,8 +179,13 @@ fn main() {
                         } else if my_name == "/" {
                             current_dir = fs_root.clone();
                             cd_changed = true;
-                        }
-                        else if let FSNode::Directory { children, size, name, parent } = &*pwd {
+                        } else if let FSNode::Directory {
+                            children,
+                            size,
+                            name,
+                            parent,
+                        } = &*pwd
+                        {
                             for c in children {
                                 let child = c.borrow();
                                 if child.name() == my_name {
@@ -137,7 +198,7 @@ fn main() {
                         if !cd_changed {
                             println!("cannot change into directory: {}", my_name);
                         }
-                    },
+                    }
                     "ls" => {
                         /* let par = {
                             let pwd = current_dir.borrow();
@@ -150,19 +211,19 @@ fn main() {
                         let pwd = current_dir.borrow_mut();
                         pwd.mkdir(name, Some(par)); */
                         // noop
-                    },
+                    }
                     _ => {
                         panic!("unknown command: {part}")
                     }
                 }
-            },
+            }
             "dir" => {
                 // create a directory inside current dir
                 let name = split_iter.next().unwrap();
                 let temp = current_dir.clone();
                 let mut pwd = temp.borrow_mut();
                 pwd.mkdir(name, Some(temp.clone()));
-            },
+            }
             _ => {
                 let size_parse = size_parse.unwrap();
                 let name = split_iter.next().unwrap();

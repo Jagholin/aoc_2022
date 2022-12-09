@@ -8,13 +8,20 @@ struct FSDirectory {
 
 impl FSDirectory {
     fn mkdir(&mut self, name: impl ToString) -> &FSNode {
-        let res = FSNode::Dir(FSDirectory { children: vec![], size: None, name: name.to_string() });
+        let res = FSNode::Dir(FSDirectory {
+            children: vec![],
+            size: None,
+            name: name.to_string(),
+        });
         self.children.push(res);
         self.children.last().unwrap()
     }
 
     fn touch(&mut self, name: impl ToString, size: usize) -> &FSNode {
-        let res = FSNode::File(FSFile { size: size, name: name.to_string() });
+        let res = FSNode::File(FSFile {
+            size: size,
+            name: name.to_string(),
+        });
         self.children.push(res);
         self.children.last().unwrap()
     }
@@ -39,8 +46,8 @@ struct FSFile {
 }
 
 enum FSNode {
-    Dir (FSDirectory),
-    File (FSFile),
+    Dir(FSDirectory),
+    File(FSFile),
 }
 
 type VisitorFN<'a> = &'a mut dyn FnMut(usize, &str, &str);
@@ -48,17 +55,13 @@ type VisitorFN<'a> = &'a mut dyn FnMut(usize, &str, &str);
 impl FSNode {
     fn mkdir(&mut self, name: impl ToString) -> Option<&FSNode> {
         match self {
-            FSNode::Dir(d) => {
-                Some(d.mkdir(name))
-            },
+            FSNode::Dir(d) => Some(d.mkdir(name)),
             FSNode::File(_) => None,
         }
-    } 
+    }
     fn touch(&mut self, name: impl ToString, size: usize) -> Option<&FSNode> {
         match self {
-            FSNode::Dir(d) => {
-                Some(d.touch(name, size))
-            },
+            FSNode::Dir(d) => Some(d.touch(name, size)),
             FSNode::File(_) => None,
         }
     }
@@ -71,7 +74,7 @@ impl FSNode {
             FSNode::Dir(d) => {
                 let next_link = d.children.iter_mut().find(|v| v.name() == next_part);
                 next_link.map(|l| l.navigate_to_mut(&path[1..])).flatten()
-            },
+            }
             FSNode::File(_) => None,
         }
     }
@@ -94,10 +97,10 @@ impl FSNode {
         match self {
             FSNode::Dir(d) => {
                 d.visit_tree(visitor);
-            },
+            }
             FSNode::File(f) => {
                 visitor(f.size, f.name.as_str(), "file");
-            },
+            }
         }
     }
 }
@@ -105,7 +108,11 @@ impl FSNode {
 fn main() {
     let input = read_to_string("input7a.txt").unwrap();
 
-    let root_fs = FSDirectory {children: vec![], name: String::from(""), size: None};
+    let root_fs = FSDirectory {
+        children: vec![],
+        name: String::from(""),
+        size: None,
+    };
     let mut root_fs = FSNode::Dir(root_fs);
 
     let mut cursor = &mut root_fs;
@@ -132,7 +139,7 @@ fn main() {
                             current_path.push(path_chunk.to_string());
                         }
                         cursor = root_fs.navigate_to_mut(&current_path[..]).unwrap();
-                    },
+                    }
                     "ls" => {
                         // nop
                     }
@@ -140,7 +147,7 @@ fn main() {
                         panic!("Unknown command: {command}");
                     }
                 }
-            },
+            }
             "dir" => {
                 // directory in ls command output
                 let dir_name = split_line.next().unwrap();
@@ -174,5 +181,8 @@ fn main() {
         }
     });
     candidates_vec.sort();
-    println!("minimum size to delete: {}", candidates_vec.first().unwrap());
+    println!(
+        "minimum size to delete: {}",
+        candidates_vec.first().unwrap()
+    );
 }

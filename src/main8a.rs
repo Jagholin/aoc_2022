@@ -1,9 +1,17 @@
 use std::fs::read_to_string;
 
-fn tree_visible_from(mut i: usize, mut j: usize, treemap: &Vec<Vec<u8>>, di: isize, dj: isize, H: usize, W: usize) -> bool {
+fn tree_visible_from(
+    mut i: usize,
+    mut j: usize,
+    treemap: &Vec<Vec<u8>>,
+    di: isize,
+    dj: isize,
+    H: usize,
+    W: usize,
+) -> bool {
     let mut visible = true;
     let compare = treemap[j][i];
-    while i != 0 && j != 0 && i != W-1 && j != H-1 {
+    while i != 0 && j != 0 && i != W - 1 && j != H - 1 {
         i = i.wrapping_add(di as usize);
         j = j.wrapping_add(dj as usize);
         if treemap[j][i] >= compare {
@@ -15,12 +23,14 @@ fn tree_visible_from(mut i: usize, mut j: usize, treemap: &Vec<Vec<u8>>, di: isi
 }
 
 fn tree_visible(i: usize, j: usize, treemap: &Vec<Vec<u8>>, H: usize, W: usize) -> bool {
-    if i == 0 || j == 0 || i == W-1 || j == H-1 {
+    if i == 0 || j == 0 || i == W - 1 || j == H - 1 {
         // trivial case
         return true;
     }
-    tree_visible_from(i, j, treemap, -1, 0, H, W) || tree_visible_from(i, j, treemap, 1, 0, H, W) 
-        || tree_visible_from(i, j, treemap, 0, -1, H, W) || tree_visible_from(i, j, treemap, 0, 1, H, W)
+    tree_visible_from(i, j, treemap, -1, 0, H, W)
+        || tree_visible_from(i, j, treemap, 1, 0, H, W)
+        || tree_visible_from(i, j, treemap, 0, -1, H, W)
+        || tree_visible_from(i, j, treemap, 0, 1, H, W)
 }
 
 fn main() {
@@ -39,7 +49,11 @@ fn main() {
     let mut counter = 0;
     for i in 0..W {
         for j in 0..H {
-            counter += if tree_visible(i, j, &treeline, H, W) {1} else {0};
+            counter += if tree_visible(i, j, &treeline, H, W) {
+                1
+            } else {
+                0
+            };
         }
     }
     println!("{counter}");
