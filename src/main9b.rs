@@ -44,7 +44,7 @@ fn main() {
     let input = read_to_string("input9.txt").unwrap();
     let mut head: Location = (0, 0);
     // let mut tail: Location = (0, 0);
-    let mut tails: Vec<_> = (0..9).into_iter().map(|_| (0, 0)).collect();
+    let mut tails: Vec<_> = vec![(0, 0); 9];
     let mut tail_positions = HashSet::new();
 
     for line in input.lines() {
@@ -62,9 +62,9 @@ fn main() {
                 _ => panic!("unknown direction {direction} in line {line}"),
             };
             let mut prev_head = head;
-            for j in 0..tails.len() {
-                tails[j] = move_tail(prev_head, tails[j]);
-                prev_head = tails[j];
+            for tail in tails.iter_mut() {
+                *tail = move_tail(prev_head, *tail);
+                prev_head = *tail;
             }
             tail_positions.insert(tails.last().unwrap().clone());
         }
