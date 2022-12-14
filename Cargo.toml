@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 regex = "1.7.0"
+thiserror = "1.0.37"
 
 [[bin]]
 name = "puzzle1a"
@@ -103,3 +104,11 @@ path = "src/main12a.rs"
 [[bin]]
 name = "puzzle12b"
 path = "src/main12b.rs"
+
+[[bin]]
+name = "puzzle13a"
+path = "src/main13a.rs"
+
+[[bin]]
+name = "puzzle13b"
+path = "src/main13b.rs"
