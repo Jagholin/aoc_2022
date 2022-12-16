@@ -69,26 +69,6 @@ fn fill_path_lengths<'a>(
     result
 }
 
-fn calculate_alpha_ceil(
-    from: &ValvePaths,
-    valves_graph: &HashMap<&str, ValvePaths>,
-    remaining_destinations: &Vec<&str>,
-    remaining_time: i32,
-) -> u32 {
-    remaining_destinations
-        .iter()
-        .map(|v| {
-            let valve = valves_graph.get(*v).unwrap();
-            let time_needed = *from.path_lengths.get(*v).unwrap() as i32 + 1;
-            if time_needed >= remaining_time {
-                0
-            } else {
-                valve.flow_rate * (remaining_time - time_needed) as u32
-            }
-        })
-        .sum::<u32>()
-}
-
 fn optimize_path<'a>(
     mut agents: Vec<Agent>,
     valves_graph: &HashMap<&str, ValvePaths>,
@@ -98,29 +78,42 @@ fn optimize_path<'a>(
 ) -> Option<(Vec<PathElement<'a>>, u32)> {
     // first figure out limit of what we can possibly do with remaining destinations and time
     // if we have less than 2 minutes, nothing we can possibly do will help
-    // let from_valves: Vec<_> = agents.iter().map(|a| valves_graph.get(a.position).unwrap()).collect();
     if agents.iter().all(|a| a.remaining_time <= 2) {
-        // return Some((vec![], current_value));
         if current_value > alpha_factor {
             return Some((vec![], current_value));
         }
         return None;
     }
 
-    // remaining time is > 2(see above), so you can cast to u32 here without underflow
-    let max_value = agents
+    // value ceiling that we can possibly get. Real values will be much lower.
+    let max_value = remaining_destinations
         .iter()
-        .map(|a| {
-            calculate_alpha_ceil(
-                valves_graph.get(a.position).unwrap(),
-                valves_graph,
-                &remaining_destinations,
-                a.remaining_time,
-            )
+        .map(|d| {
+            agents
+                .iter()
+                .map(|a| {
+                    let valve = valves_graph.get(*d).unwrap();
+                    let time_needed = *valves_graph
+                        .get(a.position)
+                        .unwrap()
+                        .path_lengths
+                        .get(*d)
+                        .unwrap() as i32
+                        + 1;
+                    if time_needed >= a.remaining_time {
+                        0
+                    } else {
+                        valve.flow_rate * (a.remaining_time - time_needed) as u32
+                    }
+                })
+                .max()
+                .unwrap()
         })
         .sum::<u32>()
         + current_value;
 
+    // if we cant be better than the best known path in this iteration, just give up and
+    // try something else
     if max_value < alpha_factor {
         return None;
     }
@@ -133,8 +126,6 @@ fn optimize_path<'a>(
         return None;
     }
 
-    // start checking different paths through the remaining_destinations
-    // they are already sorted from highest flow rate to lowest
     let mut next_alpha_factor = alpha_factor;
     // empty array is still an option if the initial value is bigger than alpha
     let mut candidate = if current_value > alpha_factor {
@@ -142,17 +133,10 @@ fn optimize_path<'a>(
     } else {
         None
     };
-
-    if agents.is_empty() {
-        if current_value > alpha_factor {
-            return Some((vec![], current_value));
-        } else {
-            return None;
-        };
-    }
     agents.sort_unstable_by(|left, right| right.remaining_time.cmp(&left.remaining_time));
-    // let cur_agent = agent.get(0).unwrap();
 
+    // start checking different paths through the remaining_destinations
+    // they are already sorted from highest flow rate to lowest
     for agent_id in 0..agents.len() {
         let mut agent_moved = false;
 
@@ -227,7 +211,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
 
         if valve_flow > 0 {
-            // the valve is a possible destination to flip this
+            // the valve is a possible destination
             destinations.push(valve_name);
         }
     }
